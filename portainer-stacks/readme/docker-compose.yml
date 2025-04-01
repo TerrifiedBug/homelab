@@ -1,14 +1,10 @@
 version: '3'
 services:
   next:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: readme.so:latest
     container_name: readme.so
     restart: always
     ports:
-      - '3000:3000'
+      - '8057:3000'
     volumes:
-      - ./:/app
-      - /app/node_modules
-      - /app/.next
+    - ./data:/app/data
