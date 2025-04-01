@@ -27,7 +27,6 @@ services:
     restart: unless-stopped
     env_file:
       - stack.env
-    environment:
     volumes:
       - meilisearch:/meili_data
 
