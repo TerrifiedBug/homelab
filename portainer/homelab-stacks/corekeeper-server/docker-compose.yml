@@ -1,0 +1,10 @@
+services:
+  core-keeper:
+    image: corekeeper:latest
+    container_name: corekeeper-server
+    volumes:
+    - ./server-files:/home/steam/core-keeper-dedicated
+    - ./server-data:/home/steam/core-keeper-data
+    restart: unless-stopped
+    env_file:
+    - stack.env

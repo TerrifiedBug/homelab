@@ -1,0 +1,11 @@
+services:
+  epicgames-freegames:
+    restart: unless-stopped
+    container_name: epicgames-freegames
+    volumes:
+    - ./config/:/usr/app/config
+    image: charlocharlie/epicgames-freegames:latest
+    ports:
+    - 8052:3000
+    env_file:
+    - stack.env

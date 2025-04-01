@@ -1,0 +1,11 @@
+services:
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    volumes:
+    - ./code-server/config:/config
+    ports:
+    - 8443:8443
+    restart: unless-stopped
+    env_file:
+    - stack.env

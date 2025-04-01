@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+    - 8054:3000
+    volumes:
+    - ./config:/app/config
+    restart: unless-stopped
+    env_file:
+    - stack.env

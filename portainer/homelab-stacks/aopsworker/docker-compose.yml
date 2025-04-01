@@ -1,0 +1,13 @@
+services:
+  aopsworker:
+    image: aopsworker:latest
+    container_name: aopsworker
+    volumes:
+    - /etc/aops-worker:/etc/aops-worker
+    - /etc/aops-worker/pip-packages:/usr/local/lib/python3.10/dist-packages
+    restart: unless-stopped
+    tty: true
+    ports:
+    - 7000:7000
+    env_file:
+    - stack.env

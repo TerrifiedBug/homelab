@@ -1,0 +1,62 @@
+version: '3'
+services:
+  mail:
+    image: ixdotai/smtp
+    env_file:
+    - stack.env
+  redis:
+    image: redis:7.2
+  db:
+    image: mariadb:10.11
+    restart: always
+    volumes:
+    - mysql_data:/var/lib/mysql
+    cap_add:
+    - SYS_NICE
+    env_file:
+    - stack.env
+  misp-core:
+    image: ghcr.io/misp/misp-docker/misp-core:latest
+    build:
+      context: core/.
+      args:
+      - CORE_TAG=${CORE_TAG:?Missing .env file, see README.md for instructions}
+      - CORE_COMMIT=${CORE_COMMIT}
+      - PHP_VER=${PHP_VER:?Missing .env file, see README.md for instructions}
+      - PYPI_REDIS_VERSION=${PYPI_REDIS_VERSION}
+      - PYPI_LIEF_VERSION=${PYPI_LIEF_VERSION}
+      - PYPI_PYDEEP2_VERSION=${PYPI_PYDEEP2_VERSION}
+      - PYPI_PYTHON_MAGIC_VERSION=${PYPI_PYTHON_MAGIC_VERSION}
+      - PYPI_MISP_LIB_STIX2_VERSION=${PYPI_MISP_LIB_STIX2_VERSION}
+      - PYPI_MAEC_VERSION=${PYPI_MAEC_VERSION}
+      - PYPI_MIXBOX_VERSION=${PYPI_MIXBOX_VERSION}
+      - PYPI_CYBOX_VERSION=${PYPI_CYBOX_VERSION}
+      - PYPI_PYMISP_VERSION=${PYPI_PYMISP_VERSION}
+    depends_on:
+    - redis
+    - db
+    ports:
+    - 8050:80
+    - 4433:443
+    volumes:
+    - ./configs/:/var/www/MISP/app/Config/
+    - ./logs/:/var/www/MISP/app/tmp/logs/
+    - ./files/:/var/www/MISP/app/files/
+    - ./ssl/:/etc/nginx/certs/
+    - ./gnupg/:/var/www/MISP/.gnupg/
+    env_file:
+    - stack.env
+  misp-modules:
+    image: ghcr.io/misp/misp-docker/misp-modules:latest
+    build:
+      context: modules/.
+      args:
+      - MODULES_TAG=${MODULES_TAG:?Missing .env file, see README.md for instructions}
+      - MODULES_COMMIT=${MODULES_COMMIT}
+      - LIBFAUP_COMMIT=${LIBFAUP_COMMIT:?Missing .env file, see README.md for instructions}
+    depends_on:
+    - redis
+    env_file:
+    - stack.env
+volumes:
+  mysql_data: null
