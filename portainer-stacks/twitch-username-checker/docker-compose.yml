@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  twitch-checker:
+    container_name: twitch-username-checker
+    image: terrifiedbug/twitch-username-checker:latest
+    restart: unless-stopped
+    env_file:
+      - stack.env
+    working_dir: /app
+    volumes:
+      - ./cron-logs:/var/log
+      - ./screenshots:/app/screenshots
