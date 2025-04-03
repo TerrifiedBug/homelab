@@ -1,5 +1,4 @@
 version: "3.9"
-
 services:
   twitch-checker:
     container_name: twitch-username-checker
@@ -7,6 +6,13 @@ services:
     restart: unless-stopped
     env_file:
       - stack.env
+    environment:
+      - USERNAMES=yourname1,yourname2
+      - WEBSITES=twitch,streampog
+      - CRON_SCHEDULE=0 8,20 * * *
+      - DISCORD_ENABLED=true
+      - EMAIL_ENABLED=true
+      - SCREENSHOTS_ENABLED=true
     working_dir: /app
     volumes:
       - ./cron-logs:/var/log
