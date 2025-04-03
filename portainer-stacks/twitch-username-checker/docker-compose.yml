@@ -7,12 +7,21 @@ services:
     env_file:
       - stack.env
     environment:
-      - USERNAMES=yourname1,yourname2
-      - WEBSITES=twitch,streampog
-      - CRON_SCHEDULE=0 8,20 * * *
-      - DISCORD_ENABLED=true
-      - EMAIL_ENABLED=true
-      - SCREENSHOTS_ENABLED=true
+      CRON_SCHEDULE: ${CRON_SCHEDULE}
+      USERNAMES: ${USERNAMES}
+      DISCORD_ENABLED: ${DISCORD_ENABLED}
+      DISCORD_WEBHOOK: ${DISCORD_WEBHOOK}
+      CALLMEBOT_ENABLED: ${CALLMEBOT_ENABLED}
+      CALLMEBOT_PHONE: ${CALLMEBOT_PHONE}
+      CALLMEBOT_APIKEY: ${CALLMEBOT_APIKEY}
+      SCREENSHOTS_ENABLED: ${SCREENSHOTS_ENABLED}
+      WEBSITES: ${WEBSITES}
+      EMAIL_ENABLED: ${EMAIL_ENABLED}
+      EMAIL_SMTP_SERVER: ${EMAIL_SMTP_SERVER}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_RECIPIENT: ${EMAIL_RECIPIENT}
     working_dir: /app
     volumes:
       - ./cron-logs:/var/log
