@@ -13,7 +13,7 @@ services:
       - ./duplicati-backups:/backups
       - /var/lib/docker/volumes:/source/docker-volumes:ro # Docker volumes
       - /data/compose:/source/compose:ro # Docker Bind mounts
-      - /data/scripts/duplicati:/source/scripts:ro # Script Mount
+      - /data/scripts/duplicati:/source/scripts:rw # Script Mount
     ports:
       - 8200:8200
     restart: unless-stopped
