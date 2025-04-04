@@ -1,8 +1,0 @@
-version: '2'
-services:
-  cloudflare-ddns:
-    image: oznu/cloudflare-ddns:latest
-    container_name: cloudflare-ddns
-    restart: always
-    env_file:
-    - stack.env
