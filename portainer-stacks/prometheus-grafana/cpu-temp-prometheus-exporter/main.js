@@ -1,4 +1,4 @@
-//This is used so you can setup a listener in Prometheus to the server ip on port 8084 to extract the CPU temp. It's ran with /usr/bin/js cpu-temp-prometheus-exporter/main.js
+//This is used so you can setup a listener in Prometheus to the server ip on port 8084 to extract the CPU temp. It's ran with node cpu-temp-prometheus-exporter/main.js
 
 const http = require('http');
 const { exec } = require('child_process');
