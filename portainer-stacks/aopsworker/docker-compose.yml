@@ -3,11 +3,14 @@ services:
     image: aopsworker:latest
     container_name: aopsworker
     volumes:
-    - /etc/aops-worker:/etc/aops-worker
-    - /etc/aops-worker/pip-packages:/usr/local/lib/python3.10/dist-packages
+      - /etc/aops-worker:/etc/aops-worker
+      - /etc/aops-worker/pip-packages:/usr/local/lib/python3.10/dist-packages
     restart: unless-stopped
     tty: true
     ports:
-    - 7000:7000
+      - 7000:7000
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      ACCESS_KEY: ${ACCESS_KEY}
+      TENANT_ID: ${TENANT_ID}

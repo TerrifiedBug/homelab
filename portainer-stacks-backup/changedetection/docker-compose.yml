@@ -1,0 +1,18 @@
+services:
+  playwright-chrome:
+    hostname: playwright-chrome
+    image: browserless/chrome
+    restart: unless-stopped
+    env_file:
+    - stack.env
+  changedetection:
+    image: ghcr.io/dgtlmoon/changedetection.io
+    container_name: changedetection
+    hostname: changedetection
+    restart: unless-stopped
+    ports:
+    - 3008:5000
+    volumes:
+    - ./data:/datastore
+    env_file:
+    - stack.env

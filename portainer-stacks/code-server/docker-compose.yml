@@ -13,7 +13,10 @@ services:
     depends_on:
       - docker
     environment:
-      - DOCKER_HOST=tcp://docker:2375
+      DOCKER_HOST: tcp://docker:2375
+      PASSWORD: ${PASSWORD}
+      PROXY_DOMAIN: ${PROXY_DOMAIN}
+      SUDO_PASSWORD: ${SUDO_PASSWORD}
     networks:
       - dev-net
 

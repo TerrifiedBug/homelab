@@ -5,10 +5,13 @@ services:
     image: pepecitron/projectzomboid-server
     restart: unless-stopped
     ports:
-    - 16261:16261/udp
-    - 16262:16262/udp
+      - 16261:16261/udp
+      - 16262:16262/udp
     volumes:
-    - ./data/server-file:/data/server-file
-    - ./data/config:/data/config
+      - ./data/server-file:/data/server-file
+      - ./data/config:/data/config
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      SERVER_ADMIN_PASSWORD: ${SERVER_ADMIN_PASSWORD}
+      SERVER_PASSWORD: ${SERVER_PASSWORD}

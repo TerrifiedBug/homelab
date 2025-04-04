@@ -3,16 +3,18 @@ services:
   db:
     image: mysql:5.7
     volumes:
-    - db_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
     restart: always
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      MYSQL_DATABASE_PASSWORD: ${MYSQL_DATABASE_PASSWORD}
   wordpress:
     image: wordpress:latest
     ports:
-    - 80
+      - 80
     restart: always
     env_file:
-    - stack.env
+      - stack.env
 volumes:
-  db_data: null
+  db_data:

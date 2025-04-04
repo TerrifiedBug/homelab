@@ -4,8 +4,15 @@ services:
     image: 2fauth/2fauth
     container_name: 2fauth
     volumes:
-    - ./2fauth:/2fauth
+      - ./2fauth:/2fauth
     ports:
-    - 8085:8000/tcp
+      - 8085:8000/tcp
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      SITE_OWNER: ${SITE_OWNER}

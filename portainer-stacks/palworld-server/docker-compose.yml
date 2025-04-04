@@ -18,3 +18,6 @@ services:
       - ./game:/palworld
     env_file:
       - stack.env
+    environment:
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SERVER_PASSWORD: ${SERVER_PASSWORD}

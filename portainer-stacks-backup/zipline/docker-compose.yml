@@ -1,0 +1,31 @@
+services:
+  postgresql:
+    image: postgres:16
+    restart: unless-stopped
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - postgres
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    env_file:
+    - stack.env
+  zipline:
+    image: ghcr.io/diced/zipline
+    ports:
+    - 3003:3000
+    depends_on:
+    - postgresql
+    volumes:
+    - ./uploads:/zipline/uploads
+    - ./public:/zipline/public
+    - ./themes:/zipline/themes
+    env_file:
+    - stack.env
+volumes:
+  pgdata: null

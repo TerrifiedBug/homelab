@@ -4,9 +4,11 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     ports:
-    - 8054:3000
+      - 8054:3000
     volumes:
-    - ./config:/app/config
+      - ./config:/app/config
     restart: unless-stopped
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: ${HOMEPAGE_ALLOWED_HOSTS}

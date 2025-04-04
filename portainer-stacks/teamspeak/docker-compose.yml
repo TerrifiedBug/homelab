@@ -3,27 +3,29 @@ services:
     image: teamspeak:latest
     restart: always
     ports:
-    - 9987:9987/udp
-    - 10011:10011
-    - 30033:30033
+      - 9987:9987/udp
+      - 10011:10011
+      - 30033:30033
     volumes:
-    - ./data/teamspeak/data:/var/ts3server
+      - ./data/teamspeak/data:/var/ts3server
     networks:
-    - teamspeak-net
+      - teamspeak-net
     depends_on:
-    - db
+      - db
     env_file:
-    - stack.env
+      - stack.env
   db:
     image: mariadb:10.5
     restart: always
     ports:
-    - 127.0.0.1:3366:3306
+      - 127.0.0.1:3366:3306
     volumes:
-    - ./data/mariadb/data:/var/lib/mysql
+      - ./data/mariadb/data:/var/lib/mysql
     networks:
-    - teamspeak-net
+      - teamspeak-net
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 networks:
-  teamspeak-net: null
+  teamspeak-net:

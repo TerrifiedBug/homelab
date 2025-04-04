@@ -3,8 +3,10 @@ services:
     image: corekeeper:latest
     container_name: corekeeper-server
     volumes:
-    - ./server-files:/home/steam/core-keeper-dedicated
-    - ./server-data:/home/steam/core-keeper-data
+      - ./server-files:/home/steam/core-keeper-dedicated
+      - ./server-data:/home/steam/core-keeper-data
     restart: unless-stopped
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      DISCORD_HOOK: ${DISCORD_HOOK}

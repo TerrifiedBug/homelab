@@ -4,15 +4,17 @@ services:
     image: browserless/chrome
     restart: unless-stopped
     env_file:
-    - stack.env
+      - stack.env
   changedetection:
     image: ghcr.io/dgtlmoon/changedetection.io
     container_name: changedetection
     hostname: changedetection
     restart: unless-stopped
     ports:
-    - 3008:5000
+      - 3008:5000
     volumes:
-    - ./data:/datastore
+      - ./data:/datastore
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      BASE_URL: ${BASE_URL}

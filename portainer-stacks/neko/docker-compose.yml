@@ -5,7 +5,10 @@ services:
     restart: unless-stopped
     shm_size: 4gb
     ports:
-    - 3006:8080
-    - 52000-52100:52000-52100/udp
+      - 3006:8080
+      - 52000-52100:52000-52100/udp
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      NEKO_PASSWORD: ${NEKO_PASSWORD}
+      NEKO_PASSWORD_ADMIN: ${NEKO_PASSWORD_ADMIN}

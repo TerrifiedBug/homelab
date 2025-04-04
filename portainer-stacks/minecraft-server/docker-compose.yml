@@ -4,10 +4,12 @@ services:
     tty: true
     stdin_open: true
     ports:
-    - 25565:25565
+      - 25565:25565
     volumes:
-    - mc-data:/data
+      - mc-data:/data
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      CF_API_KEY: ${CF_API_KEY}
 volumes:
-  mc-data: null
+  mc-data:

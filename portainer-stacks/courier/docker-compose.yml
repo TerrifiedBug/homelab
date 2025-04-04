@@ -5,6 +5,8 @@ services:
     image: tborychowski/courier
     restart: unless-stopped
     ports:
-    - 8086:3000
+      - 8086:3000
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      TOKEN: ${TOKEN}

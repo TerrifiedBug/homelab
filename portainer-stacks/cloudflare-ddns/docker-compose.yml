@@ -5,4 +5,7 @@ services:
     container_name: cloudflare-ddns
     restart: always
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      API_KEY: ${API_KEY}
+      ZONE: ${ZONE}

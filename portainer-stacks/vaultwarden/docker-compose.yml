@@ -4,8 +4,10 @@ services:
     container_name: vaultwarden
     restart: unless-stopped
     volumes:
-    - ./vw-data/:/data/
+      - ./vw-data/:/data/
     ports:
-    - 3004:80
+      - 3004:80
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      DOMAIN: ${DOMAIN}

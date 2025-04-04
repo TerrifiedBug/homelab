@@ -3,32 +3,48 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     volumes:
-    - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test:
-      - CMD-SHELL
-      - pg_isready -U postgres -d postgres
+        - CMD-SHELL
+        - pg_isready -U postgres -d postgres
       interval: 10s
       timeout: 5s
       retries: 5
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
   chrome:
     image: ghcr.io/browserless/chromium:latest
     restart: unless-stopped
     extra_hosts:
-    - host.docker.internal:host-gateway
+      - host.docker.internal:host-gateway
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      TOKEN: ${TOKEN}
   app:
     image: amruthpillai/reactive-resume:latest
     restart: unless-stopped
     ports:
-    - 3007:3000
+      - 3007:3000
     depends_on:
-    - postgres
-    - chrome
+      - postgres
+      - chrome
     env_file:
-    - stack.env
+      - stack.env
+    environment:
+      CHROME_TOKEN: ${CHROME_TOKEN}
+      PUBLIC_URL: ${PUBLIC_URL}
+      STORAGE_URL: ${STORAGE_URL}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      MAIL_FROM: ${MAIL_FROM}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
 volumes:
-  postgres_data: null
+  postgres_data:
