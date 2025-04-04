@@ -1,0 +1,15 @@
+services:
+  glance:
+    container_name: glance
+    image: glanceapp/glance
+    volumes:
+      - ./config:/app/config
+      - ./assets:/app/assets
+      # Optionally, also mount docker socket if you want to use the docker containers widget
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8059:8080
+    env_file: stack.env
+    environment:
+      MY_SECRET_TOKEN: ${MY_SECRET_TOKEN}
+
