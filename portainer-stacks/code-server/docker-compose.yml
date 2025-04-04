@@ -21,10 +21,10 @@ services:
     image: docker:dind
     container_name: code-server-dind
     privileged: true
+    ports:
+      - "2375:2375"
     environment:
       - DOCKER_TLS_CERTDIR=
-    expose:
-      - "2375"
     volumes:
       - ./dind/docker:/var/lib/docker
     restart: unless-stopped
