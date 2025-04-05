@@ -1,0 +1,15 @@
+{
+    "$schema": "https://raw.githubusercontent.com/sergi0g/cup/main/cup.schema.json",
+    "version": 3,
+    "refresh_interval": "0 0 8,20 * * *",
+    "images": {
+        "exclude": [
+            "ghcr.io/immich-app/immich-machine-learning",
+            "postgres:15",
+            "postgres:16",
+            "postgres:16-alpine",
+            "mariadb:10.11",
+            "mariadb:10.5"
+        ]
+    }
+}
