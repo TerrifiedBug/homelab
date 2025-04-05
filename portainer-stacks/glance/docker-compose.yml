@@ -12,4 +12,5 @@ services:
     env_file: stack.env
     environment:
       MY_SECRET_TOKEN: ${MY_SECRET_TOKEN}
-
+      UPTIME_KUMA_URL: ${UPTIME_KUMA_URL}
+      UPTIME_KUMA_STATUS_SLUG: ${UPTIME_KUMA_STATUS_SLUG}
