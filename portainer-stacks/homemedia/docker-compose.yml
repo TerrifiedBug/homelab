@@ -1,0 +1,133 @@
+version: "3.8"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8063:8080 # qbittorrent web UI
+      - 6881:6881 # qbittorrent torrent TCP
+      - 6881:6881/udp
+      - 8989:8989 # sonarr
+      - 7878:7878 # radarr
+      - 9696:9696 # prowlarr
+    volumes:
+      - ./gluetun:/gluetun
+    environment:
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - OPENVPN_USER=${NORDVPN_USER}
+      - OPENVPN_PASSWORD=${NORDVPN_PASS}
+      - SERVER_COUNTRIES="United Kingdom"
+      - HEALTH_VPN_DURATION_INITIAL=120s
+    healthcheck:
+      test: [ "CMD", "ping", "-c", "1", "www.google.com" ]
+      interval: 60s
+      timeout: 20s
+      retries: 5
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - ./qbittorrent:/config
+      - ./media/downloads:/downloads
+    healthcheck:
+      test: [ "CMD", "ping", "-c", "1", "www.google.com" ]
+      interval: 60s
+      retries: 3
+      start_period: 20s
+      timeout: 10s
+    labels:
+      - deunhealth.restart.on.unhealthy=true
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./prowlarr:/config
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./sonarr:/config
+      - ./media/downloads:/downloads
+      - ./media/tv:/tv
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./radarr:/config
+      - ./media/downloads:/downloads
+      - ./media/movies:/movies
+    restart: unless-stopped
+
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./overseerr/config:/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    ports:
+      - 8096:8096 # Web UI
+    volumes:
+      - ./jellyfin/config:/config
+      - ./media/movies:/movies
+      - ./media/tv:/tv
+    restart: unless-stopped
+
+  jellyseer:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseer
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Europe/London
+    ports:
+      - 5056:5055 # 5055 is internal, 5056 is host port
+    volumes:
+      - ./jellyseer:/app/config
+    restart: unless-stopped
