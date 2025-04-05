@@ -7,14 +7,13 @@ volumes:
   grafana-data:
     driver: local
 
-
 services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"
-    volumes: 
+    volumes:
       - ./prometheus:/etc/prometheus/
       - prometheus-data:/prometheus
     restart: unless-stopped
@@ -40,10 +39,10 @@ services:
     pid: host
     restart: unless-stopped
     volumes:
-      - '/:/host:ro,rslave'  
+      - '/:/host:ro,rslave'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.0     
+    image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
     ports:
       - "8080:8080"
