@@ -30,6 +30,7 @@ services:
       - "./logs:/var/www/html/storage/logs"
       - "./app-storage:/var/www/html/storage/app"
     environment:
+      PGPASSWORD: '${DB_PASSWORD}'
       CONTAINER_MODE: scheduler
     healthcheck:
       test: [ "CMD-SHELL", "supervisorctl status scheduler:scheduler_00" ]
