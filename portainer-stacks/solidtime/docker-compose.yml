@@ -20,7 +20,7 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "curl --fail http://localhost:8000/health-check/up || exit 1" ]
     env_file:
-      - laravel.env
+      - stack.env
     depends_on:
       - database
   scheduler:
@@ -38,7 +38,7 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "supervisorctl status scheduler:scheduler_00" ]
     env_file:
-      - laravel.env
+      - stack.env
     depends_on:
       - database
   queue:
@@ -57,7 +57,7 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "supervisorctl status worker:worker_00" ]
     env_file:
-      - laravel.env
+      - stack.env
     depends_on:
       - database
   database:
