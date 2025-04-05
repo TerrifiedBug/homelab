@@ -37,7 +37,14 @@ To enable syncing with Kobo e-readers:
 2. Set `Server External Port` to 80
 3. Go to your profile page, enable `Kobo sync` and copy the API endpoint
 4. **Important**: Update the API endpoint to use `https://` instead of `http://`
-5. Plug in your Kobo device and paste in the API endpoint URL
+5. Plug in your Kobo device via USB to your computer
+6. On your Kobo device, a `.kobo` hidden directory exists in the root of the device:
+7. Inside `.kobo` directory, locate and edit the `Kobo/Kobo eReader.conf` file with a text editor
+8. Find the `OneStoreServices` section in the file (add it if it doesn't exist) and add/modify this line:
+   ```
+   api_endpoint=https://your-calibre-web-domain.com/kobo/
+   ```
+   (Use the API endpoint you copied from your profile, ensuring it uses HTTPS)
 
 ## Nginx Proxy Manager Configuration
 
