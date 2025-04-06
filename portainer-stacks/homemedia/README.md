@@ -13,9 +13,8 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 | **Sonarr**     | TV show management and automation. |
 | **Radarr**     | Movie management and automation. |
 | **Prowlarr**   | Indexer manager for Sonarr and Radarr. |
-| **Overseerr**  | Web UI for users to request movies/TV shows. |
 | **Jellyfin**   | Media server to stream downloaded content. |
-| **Jellyseerr** | Jellyfin-compatible media request UI (alternative to Overseerr). |
+| **Jellyseerr** | Jellyfin-compatible media request UI (alternative to Overseerr for Jellyfin). |
 | **VPN Watchdog** | Monitors Gluetun's VPN status and stops/starts torrent-related containers if VPN disconnects or recovers. |
 
 ---
@@ -42,7 +41,6 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 ├── sonarr/
 ├── radarr/
 ├── prowlarr/
-├── overseerr/
 ├── jellyfin/
 ├── jellyseer/
 └── media/
@@ -114,7 +112,6 @@ This ensures compatibility with the minimal Alpine base image.
 | Sonarr      | http://localhost:8989           |
 | Radarr      | http://localhost:7878           |
 | Prowlarr    | http://localhost:9696           |
-| Overseerr   | http://localhost:5055           |
 | Jellyfin    | http://localhost:8096           |
 | Jellyseerr  | http://localhost:5056           |
 
@@ -130,7 +127,7 @@ This ensures compatibility with the minimal Alpine base image.
 - 🔁 Containers restart automatically when VPN returns
 - 📥 Automatic TV & movie downloads
 - 🎞️ Streaming via Jellyfin
-- 📤 Request management via Overseerr or Jellyseerr
+- 📤 Request management via Jellyseerr
 
 ---
 
@@ -150,7 +147,6 @@ This ensures compatibility with the minimal Alpine base image.
 - [Sonarr](https://sonarr.tv/)
 - [Radarr](https://radarr.video/)
 - [Prowlarr](https://github.com/Prowlarr/Prowlarr)
-- [Overseerr](https://overseerr.dev/)
 - [Jellyseerr](https://github.com/Fallenbagel/jellyseerr)
 
 ---
