@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   gluetun:
     image: qmcgaw/gluetun
@@ -8,31 +9,36 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - 8063:8080 # qbittorrent web UI
-      - 6881:6881 # qbittorrent torrent TCP
+      - 8063:8080
+      - 6881:6881
       - 6881:6881/udp
-      - 8989:8989 # sonarr
-      - 7878:7878 # radarr
-      - 9696:9696 # prowlarr
+      - 8989:8989
+      - 7878:7878
+      - 9696:9696
     volumes:
       - ./gluetun:/gluetun
+      - ./gluetun/auth/config.toml:/gluetun/auth/config.toml:ro
     environment:
       - VPN_SERVICE_PROVIDER=nordvpn
+      - HTTP_CONTROL_SERVER_AUTH_CONFIG_FILEPATH=/gluetun/auth/config.toml
       - OPENVPN_USER=${NORDVPN_USER}
       - OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES="United Kingdom"
-      - HEALTH_VPN_DURATION_INITIAL=120s
     healthcheck:
-      test: [ "CMD", "ping", "-c", "1", "www.google.com" ]
-      interval: 60s
-      timeout: 20s
+      test: [ "CMD-SHELL", "wget --user=healthcheck --password=secret -qO- http://localhost:8000/v1/openvpn/status 2>/dev/null | grep -q '\"status\":\"running\"' || exit 1" ]
+      interval: 30s
+      timeout: 10s
       retries: 5
+      start_period: 20s
     restart: unless-stopped
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -48,14 +54,15 @@ services:
       retries: 3
       start_period: 20s
       timeout: 10s
-    labels:
-      - deunhealth.restart.on.unhealthy=true
     restart: unless-stopped
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -68,6 +75,9 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -82,6 +92,9 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -113,7 +126,7 @@ services:
       - PGID=1000
       - TZ=Europe/London
     ports:
-      - 8096:8096 # Web UI
+      - 8096:8096
     volumes:
       - ./jellyfin/config:/config
       - ./media/movies:/movies
@@ -127,7 +140,37 @@ services:
       - LOG_LEVEL=debug
       - TZ=Europe/London
     ports:
-      - 5056:5055 # 5055 is internal, 5056 is host port
+      - 5056:5055
     volumes:
       - ./jellyseer:/app/config
     restart: unless-stopped
+
+  vpn-watchdog:
+    image: alpine
+    container_name: vpn-watchdog
+    restart: unless-stopped
+    network_mode: service:gluetun
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      sh -c '
+        apk add --no-cache curl >/dev/null 2>&1
+        PREVIOUS_STATUS=""
+        while true; do
+          STATUS_JSON=$(curl -su healthcheck:secret http://localhost:8000/v1/openvpn/status 2>/dev/null)
+          STATUS=$(echo "$STATUS_JSON" | sed -n "s/.*\"status\":\"\\([a-z]*\\)\".*/\\1/p")
+
+          if [ "$STATUS" = "disconnected" ] && [ "$PREVIOUS_STATUS" != "disconnected" ]; then
+            echo "[WATCHDOG] VPN is DISCONNECTED. Stopping dependent containers..."
+            docker stop qbittorrent sonarr radarr prowlarr
+          elif [ "$STATUS" = "running" ] && [ "$PREVIOUS_STATUS" = "disconnected" ]; then
+            echo "[WATCHDOG] VPN is back UP. Starting dependent containers..."
+            docker start qbittorrent sonarr radarr prowlarr
+          else
+            echo "[WATCHDOG] VPN status is $STATUS. No action needed."
+          fi
+
+          PREVIOUS_STATUS=$STATUS
+          sleep 30
+        done
+      '

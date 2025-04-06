@@ -6,16 +6,17 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 
 ## 🚀 Stack Overview
 
-| Service      | Description |
-|--------------|-------------|
-| **Gluetun**  | VPN gateway (NordVPN) for secure and private torrenting. |
-| **qBittorrent** | Torrent client routed through Gluetun. |
-| **Sonarr**   | TV show management and automation. |
-| **Radarr**   | Movie management and automation. |
-| **Prowlarr** | Indexer manager for Sonarr and Radarr. |
-| **Overseerr**| Web UI for users to request movies/TV shows. |
-| **Jellyfin** | Media server to stream downloaded content. |
+| Service        | Description |
+|----------------|-------------|
+| **Gluetun**    | VPN gateway (NordVPN) for secure and private torrenting, with enforced authentication and firewall-based leak protection. |
+| **qBittorrent**| Torrent client routed through Gluetun. |
+| **Sonarr**     | TV show management and automation. |
+| **Radarr**     | Movie management and automation. |
+| **Prowlarr**   | Indexer manager for Sonarr and Radarr. |
+| **Overseerr**  | Web UI for users to request movies/TV shows. |
+| **Jellyfin**   | Media server to stream downloaded content. |
 | **Jellyseerr** | Jellyfin-compatible media request UI (alternative to Overseerr). |
+| **VPN Watchdog** | Monitors Gluetun's VPN status and stops/starts torrent-related containers if VPN disconnects or recovers. |
 
 ---
 
@@ -24,7 +25,7 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 - A [NordVPN](https://nordvpn.com) account (OpenVPN credentials)
-- Port forwarding not required (Gluetun handles it)
+- Port forwarding not required (Gluetun handles it internally)
 
 ---
 
@@ -35,6 +36,8 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 ├── docker-compose.yml
 ├── stack.env                     # Your credentials and config
 ├── gluetun/
+│   └── auth/
+│       └── config.toml           # Gluetun control server authentication config
 ├── qbittorrent/
 ├── sonarr/
 ├── radarr/
@@ -61,7 +64,49 @@ NORDVPN_PASS=your_nordvpn_password
 
 ---
 
-4. Port Mappings:
+## 🔑 Gluetun Control Server Authentication
+
+To protect Gluetun’s internal HTTP control API:
+
+1. Create a config file at `gluetun/auth/config.toml`:
+
+```toml
+[[roles]]
+name = "healthcheck"
+routes = ["GET /v1/openvpn/status"]
+auth = "basic"
+username = "healthcheck"
+password = "secret"
+```
+
+2. Ensure the file is properly mounted in the Compose file:
+
+```yaml
+- ./gluetun/auth/config.toml:/gluetun/auth/config.toml:ro
+```
+
+3. Gluetun will enforce basic authentication for internal API access. Healthchecks and the VPN watchdog use these credentials to monitor VPN status.
+
+---
+
+## 🔄 VPN Watchdog
+
+The `vpn-watchdog` service runs a loop that:
+- Checks Gluetun’s VPN status every 30 seconds
+- Stops containers (`qbittorrent`, `sonarr`, `radarr`, `prowlarr`) if the VPN disconnects
+- Starts them again when the VPN reconnects
+
+It uses `curl` with basic authentication and installs `curl` at runtime using:
+
+```sh
+apk add --no-cache curl
+```
+
+This ensures compatibility with the minimal Alpine base image.
+
+---
+
+## 🔎 Port Mappings
 
 | Service     | URL                             |
 |-------------|----------------------------------|
@@ -73,23 +118,27 @@ NORDVPN_PASS=your_nordvpn_password
 | Jellyfin    | http://localhost:8096           |
 | Jellyseerr  | http://localhost:5056           |
 
-> Note: Sonarr, Radarr, Prowlarr, and qBittorrent are routed through Gluetun for VPN protection.
+> Note: qBittorrent, Sonarr, Radarr, and Prowlarr are routed through Gluetun for VPN protection and will not start unless the VPN is up and healthy.
 
 ---
 
 ## ✅ Features
 
 - 🔐 Secure torrenting behind Gluetun (with NordVPN)
+- 🔄 Containers only start when VPN is healthy
+- 📉 Containers automatically shut down if VPN disconnects (via VPN Watchdog)
+- 🔁 Containers restart automatically when VPN returns
 - 📥 Automatic TV & movie downloads
 - 🎞️ Streaming via Jellyfin
-- 📤 Request management via Overseerr/Jellyseerr
-- 🔄 Full automation from search to stream
+- 📤 Request management via Overseerr or Jellyseerr
 
 ---
 
 ## 💡 To Add
 
 - **Bazarr**: Subtitle downloads
+- **VPN auto-recovery alerts** via Telegram, Discord, or email
+- **Container labeling** for dynamic watchdog control
 
 ---
 
