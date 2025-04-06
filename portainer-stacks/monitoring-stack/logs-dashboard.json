@@ -1,0 +1,151 @@
+{
+    "annotations": {
+        "list": []
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "id": null,
+    "iteration": 1680000000000,
+    "links": [],
+    "panels": [
+        {
+            "datasource": "Loki",
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 1,
+            "options": {
+                "showLabels": true,
+                "showTime": true,
+                "wrapLogMessage": true,
+                "dedupStrategy": "none"
+            },
+            "targets": [
+                {
+                    "expr": "{job=~\"$job\", container_name=~\"$container_name\"} |= \"$search\"",
+                    "refId": "A"
+                }
+            ],
+            "title": "🔍 Live Logs Viewer",
+            "type": "logs"
+        },
+        {
+            "datasource": "Loki",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 8
+            },
+            "id": 2,
+            "targets": [
+                {
+                    "expr": "rate({job=~\"$job\", container_name=~\"$container_name\"} |= \"error\" [1m])",
+                    "refId": "A"
+                }
+            ],
+            "title": "❗ Errors per Second",
+            "type": "timeseries"
+        },
+        {
+            "datasource": "Loki",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 8
+            },
+            "id": 3,
+            "targets": [
+                {
+                    "expr": "rate({job=~\"$job\", container_name=~\"$container_name\"} |= \"warn\" [1m])",
+                    "refId": "A"
+                }
+            ],
+            "title": "⚠️ Warnings per Second",
+            "type": "timeseries"
+        },
+        {
+            "datasource": "Loki",
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 16
+            },
+            "id": 4,
+            "targets": [
+                {
+                    "expr": "rate({job=~\"$job\", container_name=~\"$container_name\"}[1m])",
+                    "refId": "A"
+                }
+            ],
+            "title": "📈 Overall Log Rate (per second)",
+            "type": "timeseries"
+        }
+    ],
+    "refresh": "10s",
+    "schemaVersion": 30,
+    "style": "dark",
+    "tags": [
+        "loki",
+        "logs",
+        "docker",
+        "syslog"
+    ],
+    "templating": {
+        "list": [
+            {
+                "name": "job",
+                "type": "query",
+                "datasource": "Loki",
+                "query": "label_values(job)",
+                "refresh": 1,
+                "includeAll": true,
+                "multi": true,
+                "label": "Job",
+                "current": {
+                    "selected": true,
+                    "text": "All",
+                    "value": "$__all"
+                }
+            },
+            {
+                "name": "container_name",
+                "type": "query",
+                "datasource": "Loki",
+                "query": "label_values(container_name)",
+                "refresh": 1,
+                "includeAll": true,
+                "multi": true,
+                "label": "Container Name",
+                "current": {
+                    "selected": true,
+                    "text": "All",
+                    "value": "$__all"
+                }
+            },
+            {
+                "name": "search",
+                "type": "textbox",
+                "label": "Search",
+                "description": "Enter search string for logs",
+                "default": ""
+            }
+        ]
+    },
+    "time": {
+        "from": "now-30m",
+        "to": "now"
+    },
+    "title": "System & Docker Logs",
+    "version": 2
+}

@@ -1,0 +1,50 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # System log
+  - job_name: syslog
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: syslog
+          __path__: /var/log/syslog
+
+    pipeline_stages:
+      - timestamp:
+          source: message
+          format: RFC3339
+          fallback_to_current_time: true
+      - drop:
+          older_than: 1h
+
+  # Docker logs
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+
+    relabel_configs:
+      # Manually add job name as a label
+      - target_label: job
+        replacement: docker
+
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'container_name'
+      - source_labels: ['__meta_docker_container_image']
+        target_label: 'container_image'
+      - source_labels: ['__meta_docker_container_id']
+        target_label: 'container_id'
+
+    pipeline_stages:
+      - docker: {}
+      - drop:
+          older_than: 1h
