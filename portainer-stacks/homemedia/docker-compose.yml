@@ -122,14 +122,14 @@ services:
 
   jellyseer:
     image: fallenbagel/jellyseerr:latest
-    container_name: jellyseer
+    container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/London
     ports:
       - 5056:5055
     volumes:
-      - ./jellyseer:/app/config
+      - ./jellyseerr:/app/config
     restart: unless-stopped
 
   vpn-watchdog:
