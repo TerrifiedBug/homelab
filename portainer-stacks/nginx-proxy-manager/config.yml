@@ -1,0 +1,14 @@
+tunnel: <tunnelid>
+credentials-file: /etc/cloudflared/<tunnelid>.json
+ingress:
+  - hostname: app1.domain.com
+    service: https://app:443
+    originRequest:
+      originServerName: app1.domain.com
+      noTLSVerify: true
+  - hostname: app2.domain.com
+    service: https://app:443
+    originRequest:
+      originServerName: app2.domain.com
+      noTLSVerify: true
+  - service: http_status:404
