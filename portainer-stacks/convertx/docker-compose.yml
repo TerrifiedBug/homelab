@@ -1,10 +1,13 @@
 # docker-compose.yml
 services:
-  convertx: 
+  convertx:
     image: ghcr.io/c4illin/convertx
     container_name: convertx
     restart: unless-stopped
     ports:
       - "3005:3000"
+    environment:
+      ALLOW_UNAUTHENTICATED: ${ALLOW_UNAUTHENTICATED}
+      HTTP_ALLOWED: ${HTTP_ALLOWED}
     volumes:
       - ./data:/app/data
