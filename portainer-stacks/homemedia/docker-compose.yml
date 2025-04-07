@@ -9,7 +9,8 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - 8063:8080
+      - 8064:8080
+      - 8063:8081
       - 6881:6881
       - 6881:6881/udp
       - 8989:8989
@@ -43,7 +44,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=8081
       - TORRENTING_PORT=6881
     volumes:
       - ./qbittorrent:/config
@@ -54,6 +55,22 @@ services:
       retries: 3
       start_period: 20s
       timeout: 10s
+    restart: unless-stopped
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./sabnzbd:/config
+      - ./media/downloads:/downloads
     restart: unless-stopped
 
   prowlarr:
@@ -122,14 +139,14 @@ services:
 
   jellyseer:
     image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+    container_name: jellyseer
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/London
     ports:
       - 5056:5055
     volumes:
-      - ./jellyseerr:/app/config
+      - ./jellyseer:/app/config
     restart: unless-stopped
 
   vpn-watchdog:
