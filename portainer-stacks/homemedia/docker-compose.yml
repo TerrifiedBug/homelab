@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   gluetun:
     image: qmcgaw/gluetun
@@ -29,8 +28,7 @@ services:
       #- OPENVPN_USER=${NORDVPN_USER}
       #- OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES="United Kingdom"
-    restart: on-failure
-
+    restart: unless-stopped
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -52,8 +50,7 @@ services:
       retries: 3
       start_period: 20s
       timeout: 10s
-    restart: on-failure
-
+    restart: unless-stopped
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
@@ -73,8 +70,7 @@ services:
       retries: 3
       start_period: 20s
       timeout: 10s
-    restart: on-failure
-
+    restart: unless-stopped
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -93,8 +89,7 @@ services:
       retries: 3
       start_period: 20s
       timeout: 10s
-    restart: on-failure
-
+    restart: unless-stopped
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -115,8 +110,7 @@ services:
       retries: 3
       start_period: 20s
       timeout: 10s
-    restart: on-failure
-
+    restart: unless-stopped
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
@@ -137,8 +131,7 @@ services:
       retries: 3
       start_period: 20s
       timeout: 10s
-    restart: on-failure
-
+    restart: unless-stopped
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
@@ -153,7 +146,6 @@ services:
       - ./media/movies:/movies
       - ./media/tv:/tv
     restart: unless-stopped
-
   jellyseer:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseer
