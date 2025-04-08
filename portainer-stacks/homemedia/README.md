@@ -117,21 +117,8 @@ All VPN-dependent containers have built-in healthchecks that ping Google to veri
 
 - Automatic health monitoring of each service
 - Docker dashboard visibility of which services are healthy
-- No need for a separate VPN watchdog
 
 If the VPN connection drops, the healthchecks will fail, showing you which services are affected.
-
----
-
-## 🔄 Restart Policies
-
-The stack uses carefully chosen restart policies:
-
-- **Gluetun**: `restart: unless-stopped` - keeps trying to establish VPN connections
-- **VPN-dependent services**: `restart: on-failure` - restart only if they crash
-- **Jellyfin & Jellyseerr**: `restart: unless-stopped` - always keep these running
-
-This combination provides reliability while preventing restart loops when the VPN is down.
 
 ---
 
@@ -167,7 +154,6 @@ When setting up SABnzbd for the first time:
 - 🔐 Secure downloading with NordLynx (WireGuard) for faster speeds
 - 📥 Dual download sources: Usenet (SABnzbd) and BitTorrent (qBittorrent)
 - 🩺 Health monitoring for all VPN-dependent services
-- 🧩 Smart restart policies for reliable operation
 - 📥 Automatic TV & movie downloads
 - 🎞️ Streaming via Jellyfin
 - 📤 Request management via Jellyseerr
