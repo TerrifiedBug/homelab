@@ -1,4 +1,4 @@
-# 🎬 Self-Hosted Media Stack with VPN, Jellyfin & *arr Suite
+# 🎬 Self-Hosted Media Stack with NordLynx VPN, Jellyfin & *arr Suite
 
 This repository contains a complete Docker Compose setup for a self-hosted, VPN-protected media server. It includes automated downloading (via both Usenet and torrents), organization, and streaming of TV shows and movies — all accessible through a beautiful web UI.
 
@@ -8,15 +8,14 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 
 | Service        | Description |
 |----------------|-------------|
-| **Gluetun**    | VPN gateway (NordVPN) using NordLynx (WireGuard) for secure, private, and faster downloading, with enforced authentication and firewall-based leak protection. |
-| **qBittorrent**| Torrent client routed through Gluetun. |
-| **SABnzbd**    | Usenet downloader routed through Gluetun for secure and private NZB downloads. |
+| **Gluetun**    | VPN gateway using NordVPN's NordLynx (WireGuard) for secure, private, and faster downloading. |
+| **qBittorrent**| Torrent client routed through Gluetun with health monitoring. |
+| **SABnzbd**    | Usenet downloader routed through Gluetun for secure NZB downloads. |
 | **Sonarr**     | TV show management and automation. |
 | **Radarr**     | Movie management and automation. |
 | **Prowlarr**   | Indexer manager for Sonarr and Radarr, supporting both torrent and Usenet indexers. |
 | **Jellyfin**   | Media server to stream downloaded content. |
-| **Jellyseerr** | Jellyfin-compatible media request UI (alternative to Overseerr for Jellyfin). |
-| **VPN Watchdog** | Monitors Gluetun's VPN status and stops/starts download-related containers if VPN disconnects or recovers. |
+| **Jellyseerr** | Jellyfin-compatible media request UI. |
 
 ---
 
@@ -27,7 +26,6 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 - A [NordVPN](https://nordvpn.com) account
 - A Usenet provider account (such as Eweka or Newshosting)
 - A Usenet indexer (such as NZBgeek)
-- Port forwarding not required (Gluetun handles it internally)
 
 ---
 
@@ -36,12 +34,12 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 ```
 .
 ├── docker-compose.yml
-├── stack.env                     # Your credentials and config
+├── stack.env                     # Your WireGuard private key
 ├── gluetun/
 │   └── auth/
-│       └── config.toml           # Gluetun control server authentication config
+│       └── config.toml           # Gluetun control server authentication
 ├── qbittorrent/
-├── sabnzbd/                      # SABnzbd configuration
+├── sabnzbd/
 ├── sonarr/
 ├── radarr/
 ├── prowlarr/
@@ -67,7 +65,7 @@ WIREGUARD_PRIVATE_KEY=your_wireguard_private_key
 
 ## 🔑 Setting up NordVPN with NordLynx (WireGuard)
 
-To use NordVPN with WireGuard (NordLynx) for faster downloads:
+This stack uses NordVPN's WireGuard implementation (NordLynx) for faster speeds. To set it up:
 
 1. **Get your WireGuard private key** from NordVPN:
 
@@ -78,7 +76,7 @@ To use NordVPN with WireGuard (NordLynx) for faster downloads:
    curl -s -u token:<ACCESS_TOKEN> https://api.nordvpn.com/v1/users/services/credentials | jq -r .nordlynx_private_key
    ```
 
-2. **Get server information** for your configuration:
+2. **Get server information** (optional, for reference):
    ```bash
    curl -s "https://api.nordvpn.com/v1/servers/recommendations?&filters\[servers_technologies\]\[identifier\]=wireguard_udp&limit=1" | jq -r '.[]|.hostname, .station, (.locations|.[]|.country|.city.name), (.locations|.[]|.country|.name), (.technologies|.[].metadata|.[].value), .load'
    ```
@@ -87,21 +85,6 @@ To use NordVPN with WireGuard (NordLynx) for faster downloads:
    ```env
    WIREGUARD_PRIVATE_KEY=your_wireguard_private_key_here
    ```
-
-4. You can also manually create a WireGuard config file for reference:
-   ```
-   [Interface]
-   PrivateKey = <PRIVATE_KEY>
-   Address = 10.5.0.2/32
-   DNS = 9.9.9.9
-
-   [Peer]
-   PublicKey = <PUBLIC_KEY>
-   AllowedIPs = 0.0.0.0/0, ::/0
-   Endpoint = <ENDPOINT>:51820
-   ```
-
-> Note: The Docker Compose file already has the correct WireGuard settings configured. You just need to add your private key to the environment variables.
 
 ---
 
@@ -126,24 +109,29 @@ password = "secret"
 - ./gluetun/auth/config.toml:/gluetun/auth/config.toml:ro
 ```
 
-3. Gluetun will enforce basic authentication for internal API access. Healthchecks and the VPN watchdog use these credentials to monitor VPN status.
+---
+
+## 🧠 Smart Healthchecks
+
+All VPN-dependent containers have built-in healthchecks that ping Google to verify internet connectivity through the VPN. This provides:
+
+- Automatic health monitoring of each service
+- Docker dashboard visibility of which services are healthy
+- No need for a separate VPN watchdog
+
+If the VPN connection drops, the healthchecks will fail, showing you which services are affected.
 
 ---
 
-## 🔄 VPN Watchdog
+## 🔄 Restart Policies
 
-The `vpn-watchdog` service runs a loop that:
-- Checks Gluetun's VPN status every 30 seconds
-- Stops containers (`qbittorrent`, `sabnzbd`, `sonarr`, `radarr`, `prowlarr`) if the VPN disconnects
-- Starts them again when the VPN reconnects
+The stack uses carefully chosen restart policies:
 
-It uses `curl` with basic authentication and installs `curl` at runtime using:
+- **Gluetun**: `restart: unless-stopped` - keeps trying to establish VPN connections
+- **VPN-dependent services**: `restart: on-failure` - restart only if they crash
+- **Jellyfin & Jellyseerr**: `restart: unless-stopped` - always keep these running
 
-```sh
-apk add --no-cache curl
-```
-
-This ensures compatibility with the minimal Alpine base image.
+This combination provides reliability while preventing restart loops when the VPN is down.
 
 ---
 
@@ -151,7 +139,7 @@ This ensures compatibility with the minimal Alpine base image.
 
 When setting up SABnzbd for the first time:
 
-1. You'll need to enter your Usenet provider details (server address, port, username, and password)
+1. Enter your Usenet provider details (server address, port, username, and password)
 2. If accessing SABnzbd via a custom domain or IP address, add it to the host whitelist in SABnzbd's config.ini:
    ```
    host_whitelist = localhost,127.0.0.1,your-domain.com,192.168.1.0/24
@@ -161,7 +149,6 @@ When setting up SABnzbd for the first time:
 ---
 
 ## 🔎 Port Mappings
-
 
 | Service     | URL                             |
 |-------------|----------------------------------|
@@ -173,17 +160,14 @@ When setting up SABnzbd for the first time:
 | Jellyfin    | http://localhost:8096           |
 | Jellyseerr  | http://localhost:5056           |
 
-> Note: qBittorrent, SABnzbd, Sonarr, Radarr, and Prowlarr are routed through Gluetun for VPN protection and will not start unless the VPN is up and healthy.
-
 ---
 
 ## ✅ Features
 
-- 🔐 Secure downloading behind Gluetun with NordVPN using NordLynx (WireGuard) for faster speeds
+- 🔐 Secure downloading with NordLynx (WireGuard) for faster speeds
 - 📥 Dual download sources: Usenet (SABnzbd) and BitTorrent (qBittorrent)
-- 🔄 Containers only start when VPN is healthy
-- 📉 Containers automatically shut down if VPN disconnects (via VPN Watchdog)
-- 🔁 Containers restart automatically when VPN returns
+- 🩺 Health monitoring for all VPN-dependent services
+- 🧩 Smart restart policies for reliable operation
 - 📥 Automatic TV & movie downloads
 - 🎞️ Streaming via Jellyfin
 - 📤 Request management via Jellyseerr
@@ -194,7 +178,7 @@ When setting up SABnzbd for the first time:
 
 - **Bazarr**: Subtitle downloads
 - **VPN auto-recovery alerts** via Telegram, Discord, or email
-- **Container labeling** for dynamic watchdog control
+- **Container labeling** for dynamic service management
 
 ---
 
