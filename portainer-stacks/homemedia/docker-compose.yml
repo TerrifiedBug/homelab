@@ -166,10 +166,10 @@ services:
 
           if [ "$STATUS" = "disconnected" ] && [ "$PREVIOUS_STATUS" != "disconnected" ]; then
             echo "[WATCHDOG] VPN is DISCONNECTED. Stopping dependent containers..."
-            docker stop qbittorrent sonarr radarr prowlarr
+            docker stop qbittorrent sonarr radarr prowlarr sabnzbd
           elif [ "$STATUS" = "running" ] && [ "$PREVIOUS_STATUS" = "disconnected" ]; then
             echo "[WATCHDOG] VPN is back UP. Starting dependent containers..."
-            docker start qbittorrent sonarr radarr prowlarr
+            docker start qbittorrent sonarr radarr prowlarr sabnzbd
           else
             echo "[WATCHDOG] VPN status is $STATUS. No action needed."
           fi
