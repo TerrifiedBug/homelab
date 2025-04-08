@@ -22,8 +22,12 @@ services:
     environment:
       - VPN_SERVICE_PROVIDER=nordvpn
       - HTTP_CONTROL_SERVER_AUTH_CONFIG_FILEPATH=/gluetun/auth/config.toml
-      - OPENVPN_USER=${NORDVPN_USER}
-      - OPENVPN_PASSWORD=${NORDVPN_PASS}
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=10.5.0.2/32
+      # OpenVPN config is commented out as we're now using WireGuard
+      #- OPENVPN_USER=${NORDVPN_USER}
+      #- OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES="United Kingdom"
     healthcheck:
       test: [ "CMD-SHELL", "wget --user=healthcheck --password=secret -qO- http://localhost:8000/v1/openvpn/status 2>/dev/null | grep -q '\"status\":\"running\"' || exit 1" ]
@@ -149,7 +153,6 @@ services:
       - ./jellyseer:/app/config
     restart: unless-stopped
 
-  #Optional VPN Watchdog Service
   vpn-watchdog:
     image: alpine
     container_name: vpn-watchdog

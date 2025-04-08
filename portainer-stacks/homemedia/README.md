@@ -8,7 +8,7 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 
 | Service        | Description |
 |----------------|-------------|
-| **Gluetun**    | VPN gateway (NordVPN) for secure and private downloading, with enforced authentication and firewall-based leak protection. |
+| **Gluetun**    | VPN gateway (NordVPN) using NordLynx (WireGuard) for secure, private, and faster downloading, with enforced authentication and firewall-based leak protection. |
 | **qBittorrent**| Torrent client routed through Gluetun. |
 | **SABnzbd**    | Usenet downloader routed through Gluetun for secure and private NZB downloads. |
 | **Sonarr**     | TV show management and automation. |
@@ -24,7 +24,7 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- A [NordVPN](https://nordvpn.com) account (OpenVPN credentials)
+- A [NordVPN](https://nordvpn.com) account
 - A Usenet provider account (such as Eweka or Newshosting)
 - A Usenet indexer (such as NZBgeek)
 - Port forwarding not required (Gluetun handles it internally)
@@ -60,9 +60,48 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 Create a `stack.env` file in the root directory:
 
 ```env
-NORDVPN_USER=your_nordvpn_username
-NORDVPN_PASS=your_nordvpn_password
+WIREGUARD_PRIVATE_KEY=your_wireguard_private_key
 ```
+
+---
+
+## 🔑 Setting up NordVPN with NordLynx (WireGuard)
+
+To use NordVPN with WireGuard (NordLynx) for faster downloads:
+
+1. **Get your WireGuard private key** from NordVPN:
+
+   a. Go to https://my.nordaccount.com/dashboard/nordvpn/manual-configuration/ and create an access token
+
+   b. Get your private key using curl and jq:
+   ```bash
+   curl -s -u token:<ACCESS_TOKEN> https://api.nordvpn.com/v1/users/services/credentials | jq -r .nordlynx_private_key
+   ```
+
+2. **Get server information** for your configuration:
+   ```bash
+   curl -s "https://api.nordvpn.com/v1/servers/recommendations?&filters\[servers_technologies\]\[identifier\]=wireguard_udp&limit=1" | jq -r '.[]|.hostname, .station, (.locations|.[]|.country|.city.name), (.locations|.[]|.country|.name), (.technologies|.[].metadata|.[].value), .load'
+   ```
+
+3. **Add your WireGuard private key** to your `stack.env`:
+   ```env
+   WIREGUARD_PRIVATE_KEY=your_wireguard_private_key_here
+   ```
+
+4. You can also manually create a WireGuard config file for reference:
+   ```
+   [Interface]
+   PrivateKey = <PRIVATE_KEY>
+   Address = 10.5.0.2/32
+   DNS = 9.9.9.9
+
+   [Peer]
+   PublicKey = <PUBLIC_KEY>
+   AllowedIPs = 0.0.0.0/0, ::/0
+   Endpoint = <ENDPOINT>:51820
+   ```
+
+> Note: The Docker Compose file already has the correct WireGuard settings configured. You just need to add your private key to the environment variables.
 
 ---
 
@@ -140,7 +179,7 @@ When setting up SABnzbd for the first time:
 
 ## ✅ Features
 
-- 🔐 Secure downloading behind Gluetun (with NordVPN)
+- 🔐 Secure downloading behind Gluetun with NordVPN using NordLynx (WireGuard) for faster speeds
 - 📥 Dual download sources: Usenet (SABnzbd) and BitTorrent (qBittorrent)
 - 🔄 Containers only start when VPN is healthy
 - 📉 Containers automatically shut down if VPN disconnects (via VPN Watchdog)
