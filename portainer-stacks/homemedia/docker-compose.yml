@@ -149,6 +149,7 @@ services:
       - ./jellyseer:/app/config
     restart: unless-stopped
 
+  #Optional VPN Watchdog Service
   vpn-watchdog:
     image: alpine
     container_name: vpn-watchdog
