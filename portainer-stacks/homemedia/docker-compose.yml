@@ -28,6 +28,7 @@ services:
       #- OPENVPN_USER=${NORDVPN_USER}
       #- OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES="United Kingdom"
+      - UPDATER_PERIOD=24h
     restart: unless-stopped
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
