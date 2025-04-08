@@ -44,7 +44,7 @@ This repository contains a complete Docker Compose setup for a self-hosted, VPN-
 ├── radarr/
 ├── prowlarr/
 ├── jellyfin/
-├── jellyseer/
+├── jellyseerr/
 └── media/
     ├── downloads/
     ├── movies/
