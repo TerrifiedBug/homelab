@@ -1,3 +1,4 @@
+# Get Wildcard Certificates to avoid leakage of sub domains.
 *.{$DOMAIN}, {$DOMAIN} {
   tls {
     dns cloudflare {$CLOUDFLARE_API_TOKEN}
