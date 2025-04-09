@@ -130,7 +130,6 @@ services:
     restart: unless-stopped
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
     environment:
       - PUID=1000
       - PGID=1000
@@ -144,7 +143,6 @@ services:
     restart: unless-stopped
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/London
