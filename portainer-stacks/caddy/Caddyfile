@@ -1,0 +1,321 @@
+*.{$DOMAIN}, {$DOMAIN} {
+  tls {
+    dns cloudflare {$CLOUDFLARE_API_TOKEN}
+  }
+
+  # Return 404 for the base domain
+  @base host {$DOMAIN}
+  handle @base {
+    respond "Not Found" 404
+  }
+
+  # Portainer - HTTPS
+  @portainer host portainer.{$DOMAIN}
+  handle @portainer {
+    reverse_proxy https://192.168.1.100:9443 {
+      transport http {
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  # Grafana
+  @grafana host grafana.{$DOMAIN}
+  handle @grafana {
+    reverse_proxy 192.168.1.100:3000
+  }
+
+  # NGINX Manager
+  @nginx host nginx.{$DOMAIN}
+  handle @nginx {
+    reverse_proxy 192.168.1.100:81
+  }
+
+  # Homer Dashboard
+  @homer host homer.{$DOMAIN}
+  handle @homer {
+    reverse_proxy 192.168.1.100:8051
+  }
+
+  # Prometheus
+  @prometheus host prometheus.{$DOMAIN}
+  handle @prometheus {
+    reverse_proxy 192.168.1.100:9090
+  }
+
+  # Wazuh - HTTPS
+  @wazuh host wazuh.{$DOMAIN}
+  handle @wazuh {
+    reverse_proxy https://192.168.1.100:8082 {
+      transport http {
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  # OpenSearch Dashboard
+  @opensearch host opensearch.{$DOMAIN}
+  handle @opensearch {
+    reverse_proxy 192.168.1.100:5601
+  }
+
+  # TeslaMate
+  @teslamate host teslamate.{$DOMAIN}
+  handle @teslamate {
+    reverse_proxy 192.168.1.100:3001
+  }
+
+  # PiHole
+  @pihole host pihole.{$DOMAIN}
+  handle @pihole {
+    reverse_proxy 192.168.1.100:8053
+  }
+
+  # TeslaMate Service
+  @teslamateservice host teslamateservice.{$DOMAIN}
+  handle @teslamateservice {
+    reverse_proxy 192.168.1.100:4000
+  }
+
+  # WordPress
+  @wordpress host wordpress.{$DOMAIN}
+  handle @wordpress {
+    reverse_proxy 192.168.1.100:32768
+  }
+
+  # Router
+  @router host router.{$DOMAIN}
+  handle @router {
+    reverse_proxy 192.168.1.254:80
+  }
+
+  # Investigate Tool
+  @investigate host investigate.{$DOMAIN}
+  handle @investigate {
+    reverse_proxy 192.168.1.100:7000
+  }
+
+  # Epic Games
+  @epicgames host epicgames.{$DOMAIN}
+  handle @epicgames {
+    reverse_proxy 192.168.1.100:8052
+  }
+
+  # n8n
+  @n8n host n8n.{$DOMAIN}
+  handle @n8n {
+    reverse_proxy 192.168.1.100:5678
+  }
+
+  # MISP - HTTPS
+  @misp host misp.{$DOMAIN}
+  handle @misp {
+    reverse_proxy https://192.168.1.100:4433 {
+      transport http {
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  # MinIO with large file upload support
+  @minio host minio.{$DOMAIN}
+  handle @minio {
+    request_body {
+      max_size 5GB
+    }
+    reverse_proxy 192.168.1.100:9001
+  }
+
+  # MinIO API with large file upload support
+  @minioapi host minioapi.{$DOMAIN}
+  handle @minioapi {
+    request_body {
+      max_size 5GB
+    }
+    reverse_proxy 192.168.1.100:9000
+  }
+
+  # OpenSearch API
+  @api-opensearch host api-opensearch.{$DOMAIN}
+  handle @api-opensearch {
+    reverse_proxy 192.168.1.100:9210
+  }
+
+  # Rancher - HTTPS
+  @rancher host rancher.{$DOMAIN}
+  handle @rancher {
+    reverse_proxy https://192.168.1.100:4438 {
+      transport http {
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  # Actual Budget
+  @actualbudget host actualbudget.{$DOMAIN}
+  handle @actualbudget {
+    reverse_proxy 192.168.1.100:6000
+  }
+
+  # Homepage
+  @homepage host homepage.{$DOMAIN}
+  handle @homepage {
+    reverse_proxy 192.168.1.100:8054
+  }
+
+  # 2FA Auth
+  @2fauth host 2fauth.{$DOMAIN}
+  handle @2fauth {
+    reverse_proxy 192.168.1.100:8085
+  }
+
+  # Parcel tracker
+  @parcel host parcel.{$DOMAIN}
+  handle @parcel {
+    reverse_proxy 192.168.1.100:8086
+  }
+
+  # Home Assistant
+  @homeassistant host homeassistant.{$DOMAIN}
+  handle @homeassistant {
+    reverse_proxy 192.168.1.100:8123
+  }
+
+  # HTTPD
+  @httpd host httpd.{$DOMAIN}
+  handle @httpd {
+    reverse_proxy 192.168.1.100:8085
+  }
+
+  # Grocy
+  @grocy host grocy.{$DOMAIN}
+  handle @grocy {
+    reverse_proxy 192.168.1.100:9283
+  }
+
+  # Kibana
+  @kibana host kibana.{$DOMAIN}
+  handle @kibana {
+    reverse_proxy 192.168.1.100:5601
+  }
+
+  # Authentik - HTTPS
+  @authentik host authentik.{$DOMAIN}
+  handle @authentik {
+    reverse_proxy https://192.168.1.100:9533 {
+      transport http {
+        tls_insecure_skip_verify
+      }
+    }
+  }
+
+  # Zipline
+  @zipline host zipline.{$DOMAIN}
+  handle @zipline {
+    reverse_proxy 192.168.1.100:3003
+  }
+
+  # Code Server
+  @codeserver host codeserver.{$DOMAIN}
+  handle @codeserver {
+    reverse_proxy 192.168.1.100:8443
+  }
+
+  # Uptime Kuma
+  @uptime host uptime.{$DOMAIN}
+  handle @uptime {
+    reverse_proxy 192.168.1.100:3002
+  }
+
+  # CyberChef
+  @cyberchef host cyberchef.{$DOMAIN}
+  handle @cyberchef {
+    reverse_proxy 192.168.1.100:8001
+  }
+
+  # CV
+  @cv host cv.{$DOMAIN}
+  handle @cv {
+    reverse_proxy 192.168.1.100:8002
+  }
+
+  # PDF Tools
+  @pdf host pdf.{$DOMAIN}
+  handle @pdf {
+    reverse_proxy 192.168.1.100:8055
+  }
+
+  # IT Tools
+  @it-tools host it-tools.{$DOMAIN}
+  handle @it-tools {
+    reverse_proxy 192.168.1.100:8056
+  }
+
+  # VW
+  @vw host vw.{$DOMAIN}
+  handle @vw {
+    reverse_proxy 192.168.1.100:3004
+  }
+
+  # ConvertX
+  @convertx host convertx.{$DOMAIN}
+  handle @convertx {
+    reverse_proxy 192.168.1.100:3005
+  }
+
+  # Neko
+  @neko host neko.{$DOMAIN}
+  handle @neko {
+    reverse_proxy 192.168.1.100:3006
+  }
+
+  # Resume
+  @resume host resume.{$DOMAIN}
+  handle @resume {
+    reverse_proxy 192.168.1.100:3007
+  }
+
+  # Change Detection
+  @changedetection host changedetection.{$DOMAIN}
+  handle @changedetection {
+    reverse_proxy 192.168.1.100:3008
+  }
+
+  # ReadMe
+  @readme host readme.{$DOMAIN}
+  handle @readme {
+    reverse_proxy 192.168.1.100:8057
+  }
+
+  # Hoarder
+  @hoarder host hoarder.{$DOMAIN}
+  handle @hoarder {
+    reverse_proxy 192.168.1.100:8058
+  }
+
+  # Duplicati
+  @duplicati host duplicati.{$DOMAIN}
+  handle @duplicati {
+    reverse_proxy 192.168.1.100:8200
+  }
+
+  # Glance
+  @glance host glance.{$DOMAIN}
+  handle @glance {
+    reverse_proxy 192.168.1.100:8059
+  }
+
+  # Calibre Web Automated
+  @cwa host cwa.{$DOMAIN}
+  handle @cwa {
+    reverse_proxy 192.168.1.100:8060 {
+      header_up X-Scheme {scheme}
+    }
+  }
+
+  # Cup
+  @cup host cup.{$DOMAIN}
+  handle @cup {
+    reverse_proxy 192.168.1.100:8061
+  }
+}
