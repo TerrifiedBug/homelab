@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   code-server:
     image: lscr.io/linuxserver/code-server:latest
@@ -7,19 +6,18 @@ services:
     env_file: stack.env
     volumes:
       - ./code-server/config:/config
+      - ./custom-init.sh:/custom-init.sh
     ports:
       - 8443:8443
     restart: unless-stopped
     depends_on:
       - docker
     environment:
-      DOCKER_HOST: tcp://docker:2375
-      PASSWORD: ${PASSWORD}
-      PROXY_DOMAIN: ${PROXY_DOMAIN}
-      SUDO_PASSWORD: ${SUDO_PASSWORD}
+      - DOCKER_HOST=tcp://docker:2375
+      - DOCKER_MODS=linuxserver/mods:universal-package-install
+      - CUSTOM_INIT_SCRIPT=/custom-init.sh
     networks:
       - dev-net
-
   docker:
     image: docker:dind
     container_name: code-server-dind
@@ -33,6 +31,5 @@ services:
     restart: unless-stopped
     networks:
       - dev-net
-
 networks:
   dev-net:
