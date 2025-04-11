@@ -6,6 +6,7 @@ services:
     env_file: stack.env
     volumes:
       - ./code-server/config:/config
+      - ./code-server/config/custom-cont-init.d:/custom-cont-init.d
     ports:
       - 8443:8443
     restart: unless-stopped
@@ -13,8 +14,6 @@ services:
       - docker
     environment:
       - DOCKER_HOST=tcp://docker:2375
-      - DOCKER_MODS=linuxserver/mods:universal-package-install
-      - CUSTOM_INIT_SCRIPT=/config/custom-init.sh
     networks:
       - dev-net
   docker:
