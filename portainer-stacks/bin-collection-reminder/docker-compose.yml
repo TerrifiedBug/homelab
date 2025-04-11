@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  bin-collection-reminder:
+    image: terrifiedbug/bin-collection-reminder:latest
+    container_name: bin-collection-reminder
+    env_file:
+      - stack.env
+    environment:
+      - UPRN=${UPRN}
+      - CRON_SCHEDULE=${CRON_SCHEDULE}
+      - DISCORD_ENABLED=${DISCORD_ENABLED}
+      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
+      - CALLMEBOT_ENABLED=${CALLMEBOT_ENABLED}
+      - CALLMEBOT_PHONE=${CALLMEBOT_PHONE}
+      - CALLMEBOT_APIKEY=${CALLMEBOT_APIKEY}
+      - EMAIL_ENABLED=${EMAIL_ENABLED}
+      - EMAIL_SMTP_SERVER=${EMAIL_SMTP_SERVER}
+      - EMAIL_SMTP_PORT=${EMAIL_SMTP_PORT}
+      - EMAIL_SENDER=${EMAIL_SENDER}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_RECIPIENT=${EMAIL_RECIPIENT}
+    restart: unless-stopped
