@@ -2,7 +2,6 @@ services:
   pocket-id:
     image: ghcr.io/pocket-id/pocket-id
     restart: unless-stopped
-    env_file: stack.env
     ports:
       - 8062:80
     volumes:
