@@ -4,6 +4,11 @@ services:
     restart: unless-stopped
     ports:
       - 8062:80
+    env_file:
+      - stack.env
+    environment:
+      PUBLIC_APP_URL: ${PUBLIC_APP_URL}
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY}
     volumes:
       - "./data:/app/backend/data"
     healthcheck:
