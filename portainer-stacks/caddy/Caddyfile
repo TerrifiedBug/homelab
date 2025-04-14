@@ -65,7 +65,7 @@
 	dynamic_dns {
 		provider cloudflare {env.CLOUDFLARE_API_TOKEN}
 		domains {
-			terrifiedbug.com
+			{$DOMAIN}
 		}
 	}
 	# Define Trusted Proxy IPs
@@ -92,7 +92,7 @@
 		authentication portal myportal {
 			crypto default token lifetime 86400 # Seconds until you have to re-authenticate
 			enable identity provider generic
-			cookie domain terrifiedbug.com
+			cookie domain {$DOMAIN}
 			cookie insecure off
 			transform user {
 				match realm generic
@@ -297,7 +297,7 @@
 	# Authentik
 	@authentik host authentik.{$DOMAIN}
 	handle @authentik {
-		import auth_https https://192.168.1.100:9533
+		reverse_proxy https://192.168.1.100:9533
 	}
 
 	# Zipline
@@ -345,7 +345,7 @@
 	# VW
 	@vw host vw.{$DOMAIN}
 	handle @vw {
-		import auth_http 192.168.1.100:3004
+		reverse_proxy 192.168.1.100:3004
 	}
 
 	# ConvertX
@@ -435,13 +435,13 @@
 	# Jellyfin
 	@jellyfin host jellyfin.{$DOMAIN}
 	handle @jellyfin {
-		import auth_http 192.168.1.100:8096
+		reverse_proxy 192.168.1.100:8096
 	}
 
 	# Jellyseerr
 	@jellyseer host jellyseer.{$DOMAIN}
 	handle @jellyseer {
-		import auth_http 192.168.1.100:5056
+		reverse_proxy 192.168.1.100:5056
 	}
 
 	# SABnzbd
