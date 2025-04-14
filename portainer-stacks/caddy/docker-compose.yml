@@ -1,7 +1,7 @@
 version: '3'
 services:
   caddy:
-    image: ghcr.io/caddybuilds/caddy-cloudflare:latest
+    image: serfriz/caddy-cloudflare-ddns-security:latest
     container_name: caddy
     restart: unless-stopped
     ports:
@@ -11,6 +11,8 @@ services:
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
       DOMAIN: ${DOMAIN}
+      POCKET_ID_CLIENT_ID: ${POCKET_ID_CLIENT_ID}
+      POCKET_ID_CLIENT_SECRET: ${POCKET_ID_CLIENT_SECRET}
     volumes:
       - ./caddy:/etc/caddy
       - ./data:/data
