@@ -1,7 +1,9 @@
-# Auth Snippet
-(auth) {
+# Auth HTTP Snippet
+(auth_http) {
 	@allowed_ips {
 		remote_ip 192.168.1.100/32
+		remote_ip 10.0.0.0/8
+		remote_ip 172.16.0.0/16
 	}
 
 	handle @allowed_ips {
@@ -20,6 +22,40 @@
 		authorize with mypolicy
 		reverse_proxy {args[0]} {
 			header_up X-Real-IP {remote_host}
+		}
+	}
+}
+
+# Auth HTTPS Snippet
+(auth_https) {
+	@allowed_ips {
+		remote_ip 192.168.1.100/32
+		remote_ip 10.0.0.0/8
+		remote_ip 172.16.0.0/16
+	}
+
+	handle @allowed_ips {
+		reverse_proxy {args[0]} {
+			header_up X-Real-IP {remote_host}
+			transport http {
+				tls_insecure_skip_verify
+			}
+		}
+	}
+
+	@auth {
+		path /caddy-security/*
+	}
+	route @auth {
+		authenticate with myportal
+	}
+	route /* {
+		authorize with mypolicy
+		reverse_proxy {args[0]} {
+			header_up X-Real-IP {remote_host}
+			transport http {
+				tls_insecure_skip_verify
+			}
 		}
 	}
 }
@@ -87,109 +123,97 @@
 	# Portainer - HTTPS
 	@portainer host portainer.{$DOMAIN}
 	handle @portainer {
-		reverse_proxy https://192.168.1.100:9443 {
-			transport http {
-				tls_insecure_skip_verify
-			}
-		}
+		import auth_https https://192.168.1.100:9443
 	}
 
 	# Grafana
 	@grafana host grafana.{$DOMAIN}
 	handle @grafana {
-		reverse_proxy 192.168.1.100:3000
+		import auth_http 192.168.1.100:3000
 	}
 
 	# NGINX Manager
 	@nginx host nginx.{$DOMAIN}
 	handle @nginx {
-		reverse_proxy 192.168.1.100:81
+		import auth_http 192.168.1.100:81
 	}
 
 	# Homer Dashboard
 	@homer host homer.{$DOMAIN}
 	handle @homer {
-		reverse_proxy 192.168.1.100:8051
+		import auth_http 192.168.1.100:8051
 	}
 
 	# Prometheus
 	@prometheus host prometheus.{$DOMAIN}
 	handle @prometheus {
-		reverse_proxy 192.168.1.100:9090
+		import auth_http 192.168.1.100:9090
 	}
 
 	# Wazuh - HTTPS
 	@wazuh host wazuh.{$DOMAIN}
 	handle @wazuh {
-		reverse_proxy https://192.168.1.100:8082 {
-			transport http {
-				tls_insecure_skip_verify
-			}
-		}
+		import auth_https https://192.168.1.100:8082
 	}
 
 	# OpenSearch Dashboard
 	@opensearch host opensearch.{$DOMAIN}
 	handle @opensearch {
-		reverse_proxy 192.168.1.100:5601
+		import auth_http 192.168.1.100:5601
 	}
 
 	# TeslaMate
 	@teslamate host teslamate.{$DOMAIN}
 	handle @teslamate {
-		reverse_proxy 192.168.1.100:3001
+		import auth_http 192.168.1.100:3001
 	}
 
-	# Pi-hole - UPDATED to use the snippet
+	# Pi-hole
 	@pihole host pihole.{$DOMAIN}
 	handle @pihole {
-		import auth 192.168.1.100:8053
+		import auth_http 192.168.1.100:8053
 	}
 
 	# TeslaMate Service
 	@teslamateservice host teslamateservice.{$DOMAIN}
 	handle @teslamateservice {
-		reverse_proxy 192.168.1.100:4000
+		import auth_http 192.168.1.100:4000
 	}
 
 	# WordPress
 	@wordpress host wordpress.{$DOMAIN}
 	handle @wordpress {
-		reverse_proxy 192.168.1.100:32768
+		import auth_http 192.168.1.100:32768
 	}
 
 	# Router
 	@router host router.{$DOMAIN}
 	handle @router {
-		reverse_proxy 192.168.1.254:80
+		import auth_http 192.168.1.254:80
 	}
 
 	# Investigate Tool
 	@investigate host investigate.{$DOMAIN}
 	handle @investigate {
-		reverse_proxy 192.168.1.100:7000
+		import auth_http 192.168.1.100:7000
 	}
 
 	# Epic Games
 	@epicgames host epicgames.{$DOMAIN}
 	handle @epicgames {
-		reverse_proxy 192.168.1.100:8052
+		import auth_http 192.168.1.100:8052
 	}
 
 	# n8n
 	@n8n host n8n.{$DOMAIN}
 	handle @n8n {
-		reverse_proxy 192.168.1.100:5678
+		import auth_http 192.168.1.100:5678
 	}
 
 	# MISP - HTTPS
 	@misp host misp.{$DOMAIN}
 	handle @misp {
-		reverse_proxy https://192.168.1.100:4433 {
-			transport http {
-				tls_insecure_skip_verify
-			}
-		}
+		import auth_https https://192.168.1.100:4433
 	}
 
 	# MinIO with large file upload support
@@ -198,7 +222,7 @@
 		request_body {
 			max_size 5GB
 		}
-		reverse_proxy 192.168.1.100:9001
+		import auth_http 192.168.1.100:9001
 	}
 
 	# MinIO API with large file upload support
@@ -207,233 +231,223 @@
 		request_body {
 			max_size 5GB
 		}
-		reverse_proxy 192.168.1.100:9000
+		import auth_http 192.168.1.100:9000
 	}
 
 	# OpenSearch API
 	@api-opensearch host api-opensearch.{$DOMAIN}
 	handle @api-opensearch {
-		reverse_proxy 192.168.1.100:9210
+		import auth_http 192.168.1.100:9210
 	}
 
 	# Rancher - HTTPS
 	@rancher host rancher.{$DOMAIN}
 	handle @rancher {
-		reverse_proxy https://192.168.1.100:4438 {
-			transport http {
-				tls_insecure_skip_verify
-			}
-		}
+		import auth_https https://192.168.1.100:4438
 	}
 
 	# Actual Budget
 	@actualbudget host actualbudget.{$DOMAIN}
 	handle @actualbudget {
-		reverse_proxy 192.168.1.100:6000
+		import auth_http 192.168.1.100:6000
 	}
 
 	# Homepage
 	@homepage host homepage.{$DOMAIN}
 	handle @homepage {
-		reverse_proxy 192.168.1.100:8054
+		import auth_http 192.168.1.100:8054
 	}
 
 	# 2FA Auth
 	@2fauth host 2fauth.{$DOMAIN}
 	handle @2fauth {
-		reverse_proxy 192.168.1.100:8085
+		import auth_http 192.168.1.100:8085
 	}
 
 	# Parcel tracker
 	@parcel host parcel.{$DOMAIN}
 	handle @parcel {
-		reverse_proxy 192.168.1.100:8086
+		import auth_http 192.168.1.100:8086
 	}
 
 	# Home Assistant
 	@homeassistant host homeassistant.{$DOMAIN}
 	handle @homeassistant {
-		reverse_proxy 192.168.1.100:8123
+		import auth_http 192.168.1.100:8123
 	}
 
 	# HTTPD
 	@httpd host httpd.{$DOMAIN}
 	handle @httpd {
-		reverse_proxy 192.168.1.100:8085
+		import auth_http 192.168.1.100:8085
 	}
 
 	# Grocy
 	@grocy host grocy.{$DOMAIN}
 	handle @grocy {
-		reverse_proxy 192.168.1.100:9283
+		import auth_http 192.168.1.100:9283
 	}
 
 	# Kibana
 	@kibana host kibana.{$DOMAIN}
 	handle @kibana {
-		reverse_proxy 192.168.1.100:5601
+		import auth_http 192.168.1.100:5601
 	}
 
-	# Authentik - HTTPS
+	# Authentik
 	@authentik host authentik.{$DOMAIN}
 	handle @authentik {
-		reverse_proxy https://192.168.1.100:9533 {
-			transport http {
-				tls_insecure_skip_verify
-			}
-		}
+		import auth_https https://192.168.1.100:9533
 	}
 
 	# Zipline
 	@zipline host zipline.{$DOMAIN}
 	handle @zipline {
-		reverse_proxy 192.168.1.100:3003
+		import auth_http 192.168.1.100:3003
 	}
 
 	# Code Server
 	@codeserver host codeserver.{$DOMAIN}
 	handle @codeserver {
-		reverse_proxy 192.168.1.100:8443
+		import auth_http 192.168.1.100:8443
 	}
 
-	# Uptime Kuma - UPDATED to use the snippet
+	# Uptime Kuma
 	@uptime host uptime.{$DOMAIN}
 	handle @uptime {
-		import auth 192.168.1.100:3002
+		import auth_http 192.168.1.100:3002
 	}
 
 	# CyberChef
 	@cyberchef host cyberchef.{$DOMAIN}
 	handle @cyberchef {
-		reverse_proxy 192.168.1.100:8001
+		import auth_http 192.168.1.100:8001
 	}
 
 	# CV
 	@cv host cv.{$DOMAIN}
 	handle @cv {
-		reverse_proxy 192.168.1.100:8002
+		import auth_http 192.168.1.100:8002
 	}
 
 	# PDF Tools
 	@pdf host pdf.{$DOMAIN}
 	handle @pdf {
-		reverse_proxy 192.168.1.100:8055
+		import auth_http 192.168.1.100:8055
 	}
 
 	# IT Tools
 	@it-tools host it-tools.{$DOMAIN}
 	handle @it-tools {
-		reverse_proxy 192.168.1.100:8056
+		import auth_http 192.168.1.100:8056
 	}
 
 	# VW
 	@vw host vw.{$DOMAIN}
 	handle @vw {
-		reverse_proxy 192.168.1.100:3004
+		import auth_http 192.168.1.100:3004
 	}
 
 	# ConvertX
 	@convertx host convertx.{$DOMAIN}
 	handle @convertx {
-		reverse_proxy 192.168.1.100:3005
+		import auth_http 192.168.1.100:3005
 	}
 
 	# Neko
 	@neko host neko.{$DOMAIN}
 	handle @neko {
-		reverse_proxy 192.168.1.100:3006
+		import auth_http 192.168.1.100:3006
 	}
 
 	# Resume
 	@resume host resume.{$DOMAIN}
 	handle @resume {
-		reverse_proxy 192.168.1.100:3007
+		import auth_http 192.168.1.100:3007
 	}
 
 	# Change Detection
 	@changedetection host changedetection.{$DOMAIN}
 	handle @changedetection {
-		reverse_proxy 192.168.1.100:3008
+		import auth_http 192.168.1.100:3008
 	}
 
 	# ReadMe
 	@readme host readme.{$DOMAIN}
 	handle @readme {
-		reverse_proxy 192.168.1.100:8057
+		import auth_http 192.168.1.100:8057
 	}
 
 	# Hoarder
 	@hoarder host hoarder.{$DOMAIN}
 	handle @hoarder {
-		reverse_proxy 192.168.1.100:8058
+		import auth_http 192.168.1.100:8058
 	}
 
 	# Duplicati
 	@duplicati host duplicati.{$DOMAIN}
 	handle @duplicati {
-		reverse_proxy 192.168.1.100:8200
+		import auth_http 192.168.1.100:8200
 	}
 
 	# Glance
 	@glance host glance.{$DOMAIN}
 	handle @glance {
-		reverse_proxy 192.168.1.100:8059
+		import auth_http 192.168.1.100:8059
 	}
 
 	# Calibre Web Automated
 	@cwa host cwa.{$DOMAIN}
 	handle @cwa {
-		reverse_proxy 192.168.1.100:8060 {
-			header_up X-Scheme {scheme}
-		}
+		import auth_http 192.168.1.100:8060
 	}
 
 	# Cup
 	@cup host cup.{$DOMAIN}
 	handle @cup {
-		reverse_proxy 192.168.1.100:8061
+		import auth_http 192.168.1.100:8061
 	}
 
 	# qBitTorrent
 	@qbittorrent host qbittorrent.{$DOMAIN}
 	handle @qbittorrent {
-		reverse_proxy 192.168.1.100:8063
+		import auth_http 192.168.1.100:8063
 	}
 
 	# Sonarr
 	@sonarr host sonarr.{$DOMAIN}
 	handle @sonarr {
-		reverse_proxy 192.168.1.100:8989
+		import auth_http 192.168.1.100:8989
 	}
 
 	# Radarr
 	@radarr host radarr.{$DOMAIN}
 	handle @radarr {
-		reverse_proxy 192.168.1.100:7878
+		import auth_http 192.168.1.100:7878
 	}
 
 	# Prowlarr
 	@prowlarr host prowlarr.{$DOMAIN}
 	handle @prowlarr {
-		reverse_proxy 192.168.1.100:9696
+		import auth_http 192.168.1.100:9696
 	}
 
 	# Jellyfin
 	@jellyfin host jellyfin.{$DOMAIN}
 	handle @jellyfin {
-		reverse_proxy 192.168.1.100:8096
+		import auth_http 192.168.1.100:8096
 	}
 
 	# Jellyseerr
 	@jellyseer host jellyseer.{$DOMAIN}
 	handle @jellyseer {
-		reverse_proxy 192.168.1.100:5056
+		import auth_http 192.168.1.100:5056
 	}
 
 	# SABnzbd
 	@sabnzbd host sabnzbd.{$DOMAIN}
 	handle @sabnzbd {
-		reverse_proxy 192.168.1.100:8064
+		import auth_http 192.168.1.100:8064
 	}
 
 	# Pocket-ID
