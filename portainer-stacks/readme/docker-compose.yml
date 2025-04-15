@@ -7,4 +7,6 @@ services:
     ports:
       - '8057:3000'
     volumes:
-    - ./data:/app/data
+      - ./data:/app/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
