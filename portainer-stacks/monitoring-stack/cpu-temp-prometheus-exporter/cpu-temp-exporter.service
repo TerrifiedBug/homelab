@@ -1,0 +1,12 @@
+[Unit]
+Description=Exposes CPU temps on port 8084 which is then scrapable by prometheus
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/js /data/cpu-temp-prometheus-exporter/main.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
