@@ -4,6 +4,8 @@ services:
     container_name: cup
     restart: unless-stopped
     command: -c /config/cup.json serve
+    environment:
+      - refresh_interval="0 */30 * * * *"
     ports:
       - 8061:8000
     volumes:
