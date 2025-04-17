@@ -297,7 +297,11 @@
 	# Authentik
 	@authentik host authentik.{$DOMAIN}
 	handle @authentik {
-		reverse_proxy https://192.168.1.100:9533
+	    reverse_proxy https://192.168.1.100:9533 {
+	        transport http {
+	            tls_insecure_skip_verify
+	        }
+	    }
 	}
 
 	# Zipline
@@ -381,7 +385,7 @@
 	# Hoarder
 	@hoarder host hoarder.{$DOMAIN}
 	handle @hoarder {
-		import auth_http 192.168.1.100:8058
+		reverse_proxy 192.168.1.100:8058
 	}
 
 	# Duplicati
