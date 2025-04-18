@@ -408,7 +408,10 @@
 			path /kobo/*
 		}
 		handle @kobo_path {
-			reverse_proxy 192.168.1.100:8060
+			reverse_proxy 192.168.1.100:8060 {
+				# This header is needed to download kepubs from Kobo eReader
+				header_up X-Scheme {http.request.scheme}
+			}
 		}
 
 		# Apply authentication to all other paths
