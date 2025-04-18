@@ -14,36 +14,43 @@
           feeds:
             - url: https://selfh.st/rss/
               title: selfh.st
-            - url: https://ciechanow.ski/atom.xml
-            - url: https://www.joshwcomeau.com/rss.xml
-              title: Josh Comeau
-            - url: https://samwho.dev/rss.xml
-            - url: https://ishadeed.com/feed.xml
-              title: Ahmad Shadeed
 
         - type: twitch-channels
           channels:
-            - theprimeagen
-            - j_blow
-            - piratesoftware
-            - cohhcarnage
-            - christitustech
-            - EJ_SA
+            - f0rest
+            - tarik
+            - iiTzTimmy
+            - VALORANT_Americas
+            - ESLCS
+            - BlastPremier
+            - valorant_emea
+            - VALORANT
+        - type: server-stats
+          servers:
+            - type: local
+              name: Server
 
     - size: full
       widgets:
         - type: group
           widgets:
             - type: hacker-news
-            - type: lobsters
+            - type: search
+              search-engine: google
+              autofocus: true
+              bangs:
+              - title: YouTube
+                shortcut: "!yt"
+                url: https://www.youtube.com/results?search_query={QUERY}
+              - title: Github
+                shortcut: "!gh"
+                url: https://github.com/search?q={QUERY}&type=repositories
+
 
         - type: videos
           channels:
-            - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
-            - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
-            - UCsBjURrPoezykLs9EqgamOA # Fireship
+            - UCdC0An4ZPNr_YiFiYoVbwaw # Daily Dose of Internet
             - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
-            - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
 
         - type: group
           widgets:
@@ -53,22 +60,31 @@
             - type: reddit
               subreddit: selfhosted
               show-thumbnails: true
+            - type: reddit
+              subreddit: GlobalOffensive
+              show-thumbnails: true
+            - type: reddit
+              subreddit: ValorantCompetitive
+              show-thumbnails: true
+
 
     - size: small
       widgets:
         - type: weather
-          location: London, United Kingdom
+          location: Oxford, United Kingdom
           units: metric # alternatively "imperial"
           hour-format: 12h # alternatively "24h"
           # Optionally hide the location from being displayed in the widget
-          # hide-location: true
+          hide-location: true
 
         - type: markets
           markets:
-            - symbol: SPY
-              name: S&P 500
-            - symbol: BTC-USD
-              name: Bitcoin
+            - symbol: RPI.L
+              name: Raspberry Pi
+            - symbol: SRAD
+              name: Sportradar
+            - symbol: TSLA
+              name: Tesla
             - symbol: NVDA
               name: NVIDIA
             - symbol: AAPL
@@ -83,6 +99,58 @@
           # token: ...
           repositories:
             - glanceapp/glance
+            - portainer/portainer
             - go-gitea/gitea
             - immich-app/immich
             - syncthing/syncthing
+
+        - type: custom-api
+          title: Uptime Kumas
+          url: ${UPTIME_KUMA_URL}/api/status-page/${UPTIME_KUMA_STATUS_SLUG}
+          subrequests:
+            heartbeats:
+              url: ${UPTIME_KUMA_URL}/api/status-page/heartbeat/${UPTIME_KUMA_STATUS_SLUG}
+          cache: 10m
+          template: |
+            {{ $hb := .Subrequest "heartbeats" }}
+
+            {{ if not (.JSON.Exists "publicGroupList") }}
+            <p class="color-negative">Error reading response</p>
+            {{ else if eq (len (.JSON.Array "publicGroupList")) 0 }}
+            <p>No monitors found</p>
+            {{ else }}
+
+            <ul class="dynamic-columns list-gap-8">
+              {{ range .JSON.Array "publicGroupList" }}
+              {{ range .Array "monitorList" }}
+              {{ $id := .String "id" }}
+              {{ $hbArray := $hb.JSON.Array (print "heartbeatList." $id) }}
+              {{ $latest := index $hbArray (toInt (sub ((len $hbArray) | toFloat) 1)) }}
+              <div class="flex items-center gap-12">
+                <a class="size-title-dynamic color-highlight text-truncate block grow" href="${UPTIME_KUMA_URL}/dashboard/{{ $id }}"
+                  target="_blank" rel="noreferrer">
+                  {{ .String "name" }} </a>
+                {{ if eq ($latest.Int "status") 1 }}
+                <div>{{ $latest.Int "ping" }}ms</div>
+                <div class="monitor-site-status-icon-compact" title="OK">
+                  <svg fill="var(--color-positive)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                {{ else }}
+                <div><span class="color-negative">DOWN</span></div>
+                <div class="monitor-site-status-icon-compact" title="{{ if $latest.Exists "msg" }}{{ $latest.String "msg" }}{{ else }}Error{{ end }}">
+                  <svg fill="var(--color-negative)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                {{ end }}
+              </div>
+              {{ end }}
+              {{ end }}
+            </ul>
+            {{ end }}
