@@ -297,11 +297,11 @@
 	# Authentik
 	@authentik host authentik.{$DOMAIN}
 	handle @authentik {
-	    reverse_proxy https://192.168.1.100:9533 {
-	        transport http {
-	            tls_insecure_skip_verify
-	        }
-	    }
+		reverse_proxy https://192.168.1.100:9533 {
+			transport http {
+				tls_insecure_skip_verify
+			}
+		}
 	}
 
 	# Zipline
@@ -403,7 +403,18 @@
 	# Calibre Web Automated
 	@cwa host cwa.{$DOMAIN}
 	handle @cwa {
-		import auth_http 192.168.1.100:8060
+		# Allow /kobo/* path without authentication
+		@kobo_path {
+			path /kobo/*
+		}
+		handle @kobo_path {
+			reverse_proxy 192.168.1.100:8060
+		}
+
+		# Apply authentication to all other paths
+		handle {
+			import auth_http 192.168.1.100:8060
+		}
 	}
 
 	# Cup
