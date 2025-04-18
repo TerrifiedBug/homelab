@@ -11,8 +11,7 @@
             "mariadb:10.11",
             "mariadb:10.5",
             "gcr.io/zenika-hub/alpine-chrome:123",
-            "getmeili/meilisearch:v1.11.1",
-            "test"
+            "getmeili/meilisearch:v1.11.1"
         ]
     }
 }
