@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/sergi0g/cup/main/cup.schema.json",
-    "version": 4,
+    "version": 3,
     "refresh_interval": "0 0 8,20 * * *",
     "images": {
         "exclude": [
