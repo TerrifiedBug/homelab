@@ -7,7 +7,7 @@ networks:
 services:
   server:
     image: docker.gitea.com/gitea:1.23.7
-    container_name: giteat
+    container_name: gitea
     environment:
       - USER_UID=1000
       - USER_GID=1000
